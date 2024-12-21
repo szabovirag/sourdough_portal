@@ -20,5 +20,8 @@ app.use(cookieParser());
 app.use('/api/posts', postRouter);
 app.use('/api/sourdough', sourdoughRouter);
 app.use('/api/users', userRouter);
+app.get('/api/main', (req, res) => {
+    res.sendFile(path.join(__dirname, './../public/index.html'));
+});
 
 module.exports = app;
