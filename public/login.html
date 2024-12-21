@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bejelentkezés</title>
     <link rel="stylesheet" href="/styles/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 <header>
@@ -25,9 +26,9 @@
     <section class="form-section">
         <h1>Bejelentkezés</h1>
         <p>Jelentkezz be, hogy elérd személyes kovászolási naplódat!</p>
-        <form action="/login" method="POST" class="login-form">
-            <label for="email">Email cím</label>
-            <input type="email" id="email" name="email" placeholder="Add meg az email címedet" required>
+        <form class="login-form" id="login-form">
+            <label for="username">Email cím</label>
+            <input type="text" id="username" name="username" placeholder="Add meg a felhasználóneved" required>
 
             <label for="password">Jelszó</label>
             <input type="password" id="password" name="password" placeholder="Add meg a jelszavadat" required>
@@ -36,5 +37,34 @@
         </form>
     </section>
 </main>
+<script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try{
+            await axios.post('/api/users/login',
+                {
+                    username:username,
+                    password:password,
+                },{
+                    withCredentials: true,
+                });
+            console.log('Bejelentkezett felhasználónév:', username);
+            localStorage.setItem('username',username);
+
+            const userResponse = await axios.get(`/api/users/${username}`);
+            const userID = userResponse.data.data.id;
+            localStorage.setItem('userID', userID);
+            alert('Login successful!');
+            window.location.href = '/api/main';
+        } catch (error){
+            console.error('Hiba a bejelentkezés során:', error);
+            alert('Hiba a bejelentkezés során.');
+        }
+    });
+</script>
 </body>
 </html>

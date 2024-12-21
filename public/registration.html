@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kovász Kaland</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="/styles/registration.css">
 </head>
 <body>
@@ -25,7 +26,7 @@
     <section class="form-section">
         <h1>Regisztráció</h1>
         <p>Csatlakozz a kovászkedvelők közösségéhez!</p>
-        <form action="api/users/register" method="POST" class="registration-form">
+        <form class="registration-form" id="registration-form">
             <label for="username">Felhasználónév</label>
             <input type="text" id="username" name="username" placeholder="Add meg a felhasználónevedet" required>
 
@@ -39,5 +40,30 @@
         </form>
     </section>
 </main>
+<script>
+    document.getElementById('registration-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        try {
+            const response = await axios.post('/api/users/register', {
+                username: username,
+                email: email,
+                password: password,
+            }, {
+                withCredentials: true,
+            });
+
+
+            alert('Sikeres regisztráció!');
+            window.location.href = '/api/users/login';
+        } catch (error) {
+            console.error('Hiba történt a regisztráció során:', error);
+            alert('A regisztráció során hiba történt');
+        }
+    });
+</script>
 </body>
 </html>
