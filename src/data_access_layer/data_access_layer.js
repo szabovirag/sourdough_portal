@@ -59,15 +59,22 @@ class DataAccessLayer {
         return rows;
     }
 
-    async updateUser(userId, username, email, hashedPassword, isAdmin) {
+    async updateUser(userId, updates) {
         try {
-            const query = `
-            UPDATE users 
-            SET username = ?, email = ?, hashed_password = ?, isAdmin = ? 
-            WHERE id = ?
-            `;
-            const [result] = await this._connection.query(query, [username, email, hashedPassword, isAdmin, userId]);
-            return result.affectedRows;
+            const fields = Object.keys(updates)
+                .map(key => `${key} = ?`)
+                .join(', ');
+
+            const values = Object.values(updates);
+
+            const query = `UPDATE users SET ${fields} WHERE id = ?`;
+            const [result] = await this._connection.query(query, [...values, userId]);
+
+            if (result.affectedRows === 0) {
+                return null;
+            }
+
+            return { userId, ...updates };
         } catch (e) {
             console.log(e);
         }
