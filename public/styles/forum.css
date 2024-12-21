@@ -1,0 +1,143 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f3e6;
+    color: #4b3e2e;
+}
+
+header {
+    background-color: #8b5e34;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 3rem;
+    font-family: 'Georgia', serif;
+}
+
+.logo {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-left: 2rem;
+    font-family: 'Georgia', serif;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 5px 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #fff;
+    color: #8b5e34;
+    border-radius: 5px;
+}
+
+main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+a {
+    color: #8b5e34;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #d08850;
+}
+
+a.title {
+    text-decoration: none;
+    font-weight: bold;
+    color: white;
+}
+
+.forum-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+    gap: 20px;
+}
+
+.post-list, .new-post {
+    flex: 1 1 45%;
+    max-width: 500px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1, h2 {
+    color: #7b5e3b;
+    margin-bottom: 15px;
+}
+
+#posts {
+    list-style-type: none;
+    padding: 0;
+}
+
+#posts li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#posts li:last-child {
+    border-bottom: none;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #7b5e3b;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #5a4631;
+}

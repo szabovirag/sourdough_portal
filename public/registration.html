@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kovász Kaland</title>
+    <link rel="stylesheet" href="/styles/registration.css">
+</head>
+<body>
+<header>
+    <nav>
+        <a class="title" href="/api/main">
+            <div class="logo">Kovász Kaland</div>
+        </a>
+        <ul class="navbar">
+            <li><a href="/api/main">Főoldal</a></li>
+            <li><a href="/api/users/register">Regisztráció</a></li>
+            <li><a href="/api/users/login">Bejelentkezés</a></li>
+            <li><a href="/api/posts">Fórum</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="registration-container">
+    <section class="form-section">
+        <h1>Regisztráció</h1>
+        <p>Csatlakozz a kovászkedvelők közösségéhez!</p>
+        <form action="api/users/register" method="POST" class="registration-form">
+            <label for="username">Felhasználónév</label>
+            <input type="text" id="username" name="username" placeholder="Add meg a felhasználónevedet" required>
+
+            <label for="email">Email cím</label>
+            <input type="email" id="email" name="email" placeholder="Add meg az e-mail címedet" required>
+
+            <label for="password">Jelszó</label>
+            <input type="password" id="password" name="password" placeholder="Adj meg egy erős jelszót" required>
+
+            <button type="submit">Regisztráció</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saját Kovász</title>
+    <link rel="stylesheet" href="/styles/sourdough.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<header>
+    <nav>
+        <a class="title" href="/api/main">
+            <div class="logo">Kovász Kaland</div>
+        </a>
+        <ul class="navbar">
+            <li><a href="/api/main">Főoldal</a></li>
+            <li><a href="/api/users/register">Regisztráció</a></li>
+            <li><a href="/api/users/login">Bejelentkezés</a></li>
+            <li><a href="/api/posts">Fórum</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="starter-container">
+    <section class="starter-info">
+        <h1>A Kovászom</h1>
+        <div id="starter-details">
+            <p id="starter-name">Kovász neve: <span></span></p>
+            <p id="hydration-level">Hidratációs szint: <span></span>%</p>
+            <p id="position">Pozíció: <span></span></p>
+            <p id="last-fed">Utolsó etetés: <span></span></p>
+            <p id="created-at">Létrehozva: <span></span></p>
+        </div>
+    </section>
+
+    <section class="starter-actions">
+        <h2>Kovász kezelése</h2>
+        <button id="feed-button">Kovász etetése</button>
+        <button id="delete-button">Kovász törlése</button>
+    </section>
+</main>
+</body>
+</html>
