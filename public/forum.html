@@ -14,10 +14,11 @@
             <div class="logo">Kovász Kaland</div>
         </a>
         <ul class="navbar">
-            <li><a href="/api/main">Főoldal</a></li>
-            <li><a href="/api/users/register">Regisztráció</a></li>
-            <li><a href="/api/users/login">Bejelentkezés</a></li>
-            <li><a href="/api/posts">Fórum</a></li>
+            <li><a href="/api/main" id="mainButton">Főoldal</a></li>
+            <li><a href="/api/users/register" id="registrationButton">Regisztráció</a></li>
+            <li><a href="" id="logoutButton">Kijelentkezés</a></li>
+            <li><a href="/api/users/login" id="loginButton">Bejelentkezés</a></li>
+            <li><a href="/api/posts" id="forumButton">Fórum</a></li>
         </ul>
     </nav>
 </header>
@@ -41,6 +42,51 @@
 </main>
 </body>
 <script>
+    function isUserLoggedIn() {
+        const cookies = document.cookie
+            .split('; ')
+            .map(cookie => cookie.split('='))
+            .reduce((acc, [key, value]) => {
+                acc[key] = value;
+                return acc;
+            }, {});
+
+        if (cookies.jwt && cookies.jwt.trim() !== ''){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const logoutButton = document.getElementById('logoutButton');
+        const loginButton = document.getElementById('loginButton');
+        const registrationButton = document.getElementById('registrationButton');
+
+        if (isUserLoggedIn()) {
+            logoutButton.style.display = 'block';
+            logoutButton.style = "text-decoration: none;"
+            loginButton.style.display = 'none';
+            registrationButton.style.display = 'none';
+        } else {
+            logoutButton.style.display = 'none';
+            loginButton.style.display = 'block';
+            loginButton.style = "text-decoration: none;"
+            registrationButton.style.display = 'block';
+            registrationButton.style = "text-decoration: none;"
+        }
+    });
+
+    document
+        .getElementById('logoutButton')
+        .addEventListener('click', async function () {
+            localStorage.removeItem('username');
+            localStorage.removeItem('userID');
+
+            document.cookie = 'jwt=; path=/;';
+            window.location.reload();
+        });
+
     document.getElementById('new-post-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
