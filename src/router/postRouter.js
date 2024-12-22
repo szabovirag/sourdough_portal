@@ -16,7 +16,11 @@ router.use(userController.protect);
 router.route('/')
     .post(postController.addPost);
 router.route('/:postID')
-    .post(postController.addComment)
+    .post(postController.addComment);
+
+router.use(userController.restrictToAdmin);
+
+router.route('/:postID')
     .patch(postController.updatePost)
     .delete(postController.deletePost);
 router.route('/:postID/comments/:commentID')
