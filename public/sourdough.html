@@ -26,20 +26,13 @@
 
 <main class="starter-container">
     <section class="starter-info">
-        <h1>A Kovászom</h1>
-        <div id="starter-details">
-            <p id="starter-name">Kovász neve: <span></span></p>
-            <p id="hydration-level">Hidratációs szint: <span></span>%</p>
-            <p id="position">Pozíció: <span></span></p>
-            <p id="last-fed">Utolsó etetés: <span></span></p>
-            <p id="created-at">Létrehozva: <span></span></p>
-        </div>
+        <h1>Kovászok</h1>
+        <div id="starter-list"></div>
     </section>
 
     <section class="starter-actions">
         <h2>Kovász kezelése</h2>
-        <button id="feed-button">Kovász etetése</button>
-        <button id="delete-button">Kovász törlése</button>
+        <button id="feed-button">Összes kovász etetése</button>
     </section>
 </main>
 <script>
@@ -103,88 +96,101 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const starterDetails = {
-            starter_name: document.querySelector('#starter-name span'),
-            hydration_level: document.querySelector('#hydration-level span'),
-            position: document.querySelector('#position span'),
-            last_fed: document.querySelector('#last-fed span'),
-            created_at: document.querySelector('#created-at span'),
-        };
-
+        const starterList = document.getElementById('starter-list');
         const feedButton = document.getElementById('feed-button');
-        const deleteButton = document.getElementById('delete-button');
 
         const userID = localStorage.getItem('userID');
 
-        async function fetchStarter() {
+        async function fetchStarters() {
             try {
                 const response = await axios.get(`/api/sourdough/user/${userID}`);
-                const sourdoughs = response.data.data;
-                if (!sourdoughs || sourdoughs.length === 0) {
+                const starters = response.data.data;
+                if (!starters || starters.length === 0) {
                     alert('Nem található kovász a felhasználóhoz.');
                     return;
                 }
-                const { starter_name, hydration_level, position, last_fed, created_at} = sourdoughs[0];
+                starterList.innerHTML = '';
+                starters.forEach((starter) => {
+                    const starterElement = document.createElement('div');
+                    starterElement.className = 'starter-item';
+                    starterElement.innerHTML = `
+                    <p>Kovász neve: <span>${starter.starter_name}</span></p>
+                    <p>Hidratációs szint: <span>${starter.hydration_level || 'N/A'}</span>%</p>
+                    <p>Pozíció: <span>${starter.position || 'N/A'}</span></p>
+                    <p>Utolsó etetés: <span>${new Date(starter.last_fed).toLocaleString()}</span></p>
+                    <p>Létrehozva: <span>${new Date(starter.created_at).toLocaleString()}</span></p>
+                    <button class="feed-individual" data-id="${starter.id}">Etetés</button>
+                    <button class="delete-individual" data-id="${starter.id}">Törlés</button>
+                `;
+                    starterList.appendChild(starterElement);
+                });
 
-                starterDetails.starter_name.textContent = starter_name || 'Nincs név megadva';
-                starterDetails.hydration_level.textContent = hydration_level || 'Nincs adat';
-                starterDetails.position.textContent = position || 'Nincs pozíció';
-                starterDetails.last_fed.textContent = last_fed ? new Date(last_fed).toLocaleString() : 'Nincs adat';
-                starterDetails.created_at.textContent = created_at ? new Date(created_at).toLocaleString() : 'Nincs adat';
+                document.querySelectorAll('.feed-individual').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const starterID = e.target.getAttribute('data-id');
+                        await feedStarter(starterID);
+                    });
+                });
+
+                document.querySelectorAll('.delete-individual').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const starterID = e.target.getAttribute('data-id');
+                        await deleteStarter(starterID);
+                    });
+                });
+
             } catch (error) {
                 console.error('Hiba a kovász adatok betöltésekor:', error);
                 alert('Nem sikerült betölteni a kovász adatait.');
             }
         }
 
-        feedButton.addEventListener('click', async () => {
+        async function feedStarter(starterID) {
             try {
-                const sourdoughResponse = await axios.get(`/api/sourdough/user/${userID}`);
-                const sourdoughs = sourdoughResponse.data.data;
+                const starterResponse = await axios.get(`/api/sourdough/id/${starterID}`);
+                const starter = starterResponse.data.data;
+                console.log(starter);
 
-                if (sourdoughs && sourdoughs.length > 0) {
-                    const sourdough = sourdoughs[0];
-
-                    const updatedData = {
-                        name: sourdough.starter_name,
-                        hydration_level: sourdough.hydration_level,
-                        position: sourdough.position,
-                        last_fed: formatDateForMySQL(new Date()),
-                    };
-                    await axios.patch(`/api/sourdough/id/${sourdough.id}`, updatedData);
-                    alert('A kovászt sikeresen megetetted!');
-                    await fetchStarter();
-                } else {
-                    alert('Nem található kovász a felhasználóhoz.');
-                }
+                await axios.patch(`/api/sourdough/id/${starterID}`, {
+                    name: starter.starter_name,
+                    hydration_level: starter.hydration_level,
+                    position: starter.position,
+                    last_fed: formatDateForMySQL(new Date())
+                });
+                await fetchStarters();
             } catch (error) {
                 console.error('Hiba a kovász etetésekor:', error);
             }
-        });
+        }
 
-        deleteButton.addEventListener('click', async () => {
-            const confirmDelete = confirm('Biztosan törölni szeretnéd a kovászodat?');
+        async function deleteStarter(starterID) {
+            const confirmDelete = confirm('Biztosan törölni szeretnéd a kovászt?');
             if (confirmDelete) {
                 try {
-                    const sourdoughResponse = await axios.get(`/api/sourdough/user/${userID}`);
-                    const sourdoughs = sourdoughResponse.data.data;
-
-                    if (sourdoughs && sourdoughs.length > 0) {
-                        const sourdoughID = sourdoughs[0].id;
-                        await axios.delete(`/api/sourdough/${sourdoughID}`);
-                        alert('A kovászt törölted!');
-                        window.location.href = '/api/main';
-                    } else {
-                        alert('Nem található kovász a felhasználóhoz.');
-                    }
+                    await axios.delete(`/api/sourdough/id/${starterID}`);
+                    alert('A kovászt törölted!');
+                    await fetchStarters();
                 } catch (error) {
                     console.error('Hiba a kovász törlésekor:', error);
-                    alert('Nem sikerült törölni a kovászt.');
                 }
+            }
+        }
+
+        feedButton.addEventListener('click', async () => {
+            try {
+                const response = await axios.get(`/api/sourdough/user/${userID}`);
+                const starters = response.data.data;
+
+                for (const starter of starters) {
+                    await feedStarter(starter.id);
+                }
+                alert('Minden kovászt megetettél!');
+            } catch (error) {
+                console.error('Hiba az összes kovász etetésekor:', error);
             }
         });
 
-        fetchStarter();
+        fetchStarters();
     });
 </script>
 </body>
