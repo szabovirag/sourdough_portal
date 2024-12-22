@@ -92,14 +92,24 @@ class DataAccessLayer {
     //#endregion
 
     //#region Sourdough Logs
-    async createSourdoughLog(userId, starterName, hydrationLevel, position = 'pult', last_fed, created_at) {
+    async createSourdoughLog(userId, starterName, hydrationLevel, position = 'pult', last_fed) {
         try {
             const query = `
-            INSERT INTO sourdough_logs (user_id, starter_name, hydration_level, position, last_fed, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO sourdough_logs (user_id, starter_name, hydration_level, position, last_fed) 
+            VALUES (?, ?, ?, ?, ?)
             `;
-            const [result] = await this._connection.query(query, [userId, starterName, hydrationLevel, position, last_fed, created_at]);
+            const [result] = await this._connection.query(query, [userId, starterName, hydrationLevel, position, last_fed]);
             return result.insertId;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async getAllSourdoughs() {
+        try {
+            const query = `SELECT * FROM sourdough_logs`;
+            const [rows] = await this._connection.query(query);
+            return rows;
         } catch (e) {
             console.log(e);
         }

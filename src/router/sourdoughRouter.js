@@ -8,11 +8,13 @@ router.use(userController.protect);
 
 router.route('/')
     .get(sourdoughController.getSourdoughPage);
-router.route('/:id')
+router.route('/id/:id')
     .get(sourdoughController.getSourdoughByID);
+router.route('/user/:id')
+    .get(sourdoughController.getSourdoughByUserID);
 router.route('/')
     .post(sourdoughController.addSourdough);
-router.route('/:id')
+router.route('/id/:id')
     .patch(sourdoughController.updateSourdough)
     .delete(sourdoughController.deleteSourdough);
 
