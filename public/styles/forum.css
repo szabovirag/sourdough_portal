@@ -141,3 +141,36 @@ button {
 button:hover {
     background-color: #5a4631;
 }
+
+div#postContainer {
+    background-color: #f8f3e6;
+    padding: 1em;
+    border-radius: 0.3em;
+    margin-top: 2em;
+}
+
+#post {
+    background-color: #fff;
+    border-radius: 0.3em;
+    padding: 0.5em;
+    margin-bottom: 2em;
+}
+
+p.text {
+    background-color: #f8f3e6;
+    padding: 0.5em;
+    border: thin solid lightgray;
+    border-radius: 0.4em;
+}
+
+
+.comment_user, .postUsername {
+    font-weight: bold;
+}
+
+input.commentInput {
+    margin-left: 0.7em;
+    padding: 0.3em;
+    width: 70%;
+    display: inline;
+}
