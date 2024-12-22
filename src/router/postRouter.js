@@ -1,15 +1,21 @@
 const express = require('express');
 const postController = require('../controller/postController');
+const userController = require('../controller/userController');
 
 const router = express.Router();
 
 router.route('/all')
     .get(postController.getAllPosts);
 router.route('/')
-    .get(postController.getForumPage)
+    .get(postController.getForumPage);
+router.route('/:postID')
+    .get(postController.getCommentsByPostID);
+
+router.use(userController.protect);
+
+router.route('/')
     .post(postController.addPost);
 router.route('/:postID')
-    .get(postController.getCommentsByPostID)
     .post(postController.addComment)
     .patch(postController.updatePost)
     .delete(postController.deletePost);

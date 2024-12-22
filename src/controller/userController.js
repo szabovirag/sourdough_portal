@@ -2,6 +2,8 @@ const {dataAccessLayer} = require("../dataAccess.js");
 const catchAsync = require('../utils/catchAsync');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const {promisify} = require('util');
 
 exports.getRegistrationPage = (req, res) => {
     res.sendFile(path.join(__dirname, '../../public/registration.html'));
@@ -9,6 +11,31 @@ exports.getRegistrationPage = (req, res) => {
 
 exports.getLoginPage = (req, res) => {
     res.sendFile(path.join(__dirname, '../../public/login.html'));
+};
+
+const signToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+};
+
+const createSendToken = (user, statusCode, req, res) => {
+    const token = signToken(user.id);
+
+    res.cookie('jwt', token, {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+        ),
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    });
+
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: {
+            user,
+        },
+    });
 };
 
 exports.getAllUsers = async (req, res) => {
@@ -159,10 +186,7 @@ exports.registerUser = catchAsync(async (req, res, next) => {
             false,
         );
 
-        return res.status(200).json({
-            status: 'success',
-            data: newUser,
-        })
+        createSendToken(newUser, 201, req, res);
 
     } catch (error) {
         next(error);
@@ -196,10 +220,7 @@ exports.loginUser = catchAsync(async (req, res, next) => {
         }))
     }
 
-    return res.status(200).json({
-        status: 'success',
-        data: user,
-    })
+    createSendToken(user, 200, req, res);
 });
 
 exports.updateUser = async (req, res) => {
@@ -258,4 +279,70 @@ exports.deleteUser = async (req, res) => {
         data: 'null',
     });
 }
+
+exports.protect = catchAsync(async (req, res, next) => {
+    let token;
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
+        token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
+    }
+
+    if (!token) {
+        return next(
+            res.status(401).json({
+                status: 'fail',
+                message: 'You are not logged in! Please log in to get access.',
+            })
+        );
+    }
+
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    const currentUser = await dataAccessLayer.getUserById(decoded.id);
+    if (!currentUser) {
+        return next(
+            res.status(401).json({
+                status: 'fail',
+                message: 'The user belonging to this token does no longer exist.',
+            })
+        );
+    }
+
+    req.user = currentUser;
+    res.locals.user = currentUser;
+    next();
+});
+
+exports.isLoggedIn = async (req, res, next) => {
+    if (req.cookies.jwt) {
+        try {
+            const decoded = await promisify(jwt.verify)(
+                req.cookies.jwt,
+                process.env.JWT_SECRET,
+            );
+
+            const currentUser = await dataAccessLayer.getUserById(decoded.id);
+            if (!currentUser) {
+                return next();
+            }
+
+            res.locals.user = currentUser;
+            return next();
+        } catch (err) {
+            return next();
+        }
+    }
+    next();
+};
+
+exports.restrictToAdmin = (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).sendFile(path.join(__dirname, '../../public/no-access.html'));
+    }
+    next();
+};
 
