@@ -106,10 +106,13 @@
             }, {
                 withCredentials: true,
             });
-
+            localStorage.setItem('username',username);
+            const userResponse = await axios.get(`/api/users/${username}`);
+            const userID = userResponse.data.data.id;
+            localStorage.setItem('userID', userID);
 
             alert('Sikeres regisztráció!');
-            window.location.href = '/api/users/login';
+            window.location.href = '/api/main';
         } catch (error) {
             console.error('Hiba történt a regisztráció során:', error);
             alert('A regisztráció során hiba történt');
