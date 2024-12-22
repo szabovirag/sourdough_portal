@@ -17,6 +17,7 @@
             <li><a href="/api/main" id="mainButton">Főoldal</a></li>
             <li><a href="/api/users/register" id="registrationButton">Regisztráció</a></li>
             <li><a href="" id="logoutButton">Kijelentkezés</a></li>
+            <li><a href="/api/sourdough" id="sourdoughButton">Saját kovászom</a></li>
             <li><a href="/api/users/login" id="loginButton">Bejelentkezés</a></li>
             <li><a href="/api/posts" id="forumButton">Fórum</a></li>
         </ul>
@@ -60,16 +61,20 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
         const logoutButton = document.getElementById('logoutButton');
+        const sourdoughButton = document.getElementById('sourdoughButton');
         const loginButton = document.getElementById('loginButton');
         const registrationButton = document.getElementById('registrationButton');
 
         if (isUserLoggedIn()) {
             logoutButton.style.display = 'block';
             logoutButton.style = "text-decoration: none;"
+            sourdoughButton.style.display = 'block';
+            sourdoughButton.style = "text-decoration: none;"
             loginButton.style.display = 'none';
             registrationButton.style.display = 'none';
         } else {
             logoutButton.style.display = 'none';
+            sourdoughButton.style.display = 'none';
             loginButton.style.display = 'block';
             loginButton.style = "text-decoration: none;"
             registrationButton.style.display = 'block';
