@@ -23,7 +23,21 @@
         </ul>
     </nav>
 </header>
-
+<section class="add-starter">
+    <h2>Új kovász hozzáadása</h2>
+    <form id="add-starter-form">
+        <label for="new-starter-name">Kovász neve:</label>
+        <input type="text" id="new-starter-name" name="starter-name" required>
+        <label for="new-hydration-level">Hidratációs szint (%):</label>
+        <input type="number" id="new-hydration-level" name="hydration-level" min="0" max="100" required>
+        <label for="new-position">Pozíció:</label>
+        <select id="new-position" name="position" required>
+            <option value="hűtő">Hűtő</option>
+            <option value="pult">Pult</option>
+        </select>
+        <button type="submit">Kovász hozzáadása</button>
+    </form>
+</section>
 <main class="starter-container">
     <section class="starter-info">
         <h1>Kovászok</h1>
@@ -98,8 +112,42 @@
     document.addEventListener('DOMContentLoaded', () => {
         const starterList = document.getElementById('starter-list');
         const feedButton = document.getElementById('feed-button');
+        const addStarterForm = document.getElementById('add-starter-form');
 
         const userID = localStorage.getItem('userID');
+
+        addStarterForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('new-starter-name').value.trim();
+            const hydrationLevel = parseInt(document.getElementById('new-hydration-level').value, 10);
+            const position = document.getElementById('new-position').value.trim();
+
+            if (!name || isNaN(hydrationLevel) || !position) {
+                alert('Kérlek töltsd ki az összes mezőt!');
+                return;
+            }
+
+            try {
+                const response = await axios.post(`/api/sourdough`, {
+                    userID: userID,
+                    name: name,
+                    hydrationLevel: hydrationLevel,
+                    position: position,
+                    last_fed: formatDateForMySQL(new Date())
+                });
+
+                if (response.data.status === 'success') {
+                    alert('Kovász sikeresen hozzáadva!');
+                    location.reload();
+                } else {
+                    alert('Hiba történt a kovász hozzáadása közben.');
+                }
+            } catch (error) {
+                console.error('Hiba a kovász hozzáadásakor:', error);
+                alert('Nem sikerült hozzáadni a kovászt.');
+            }
+        });
 
         async function fetchStarters() {
             try {
@@ -168,7 +216,6 @@
             if (confirmDelete) {
                 try {
                     await axios.delete(`/api/sourdough/id/${starterID}`);
-                    alert('A kovászt törölted!');
                     await fetchStarters();
                 } catch (error) {
                     console.error('Hiba a kovász törlésekor:', error);

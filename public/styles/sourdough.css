@@ -82,7 +82,7 @@ a.title {
     color: white;
 }
 
-.starter-container {
+.starter-container, .add-starter {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
