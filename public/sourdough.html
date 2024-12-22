@@ -84,8 +84,103 @@
             localStorage.removeItem('userID');
 
             document.cookie = 'jwt=; path=/;';
-            window.location.reload();
         });
+
+    function formatDateForMySQL(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const starterDetails = {
+            starter_name: document.querySelector('#starter-name span'),
+            hydration_level: document.querySelector('#hydration-level span'),
+            position: document.querySelector('#position span'),
+            last_fed: document.querySelector('#last-fed span'),
+            created_at: document.querySelector('#created-at span'),
+        };
+
+        const feedButton = document.getElementById('feed-button');
+        const deleteButton = document.getElementById('delete-button');
+
+        const userID = localStorage.getItem('userID');
+
+        async function fetchStarter() {
+            try {
+                const response = await axios.get(`/api/sourdough/user/${userID}`);
+                const sourdoughs = response.data.data;
+                if (!sourdoughs || sourdoughs.length === 0) {
+                    alert('Nem található kovász a felhasználóhoz.');
+                    return;
+                }
+                const { starter_name, hydration_level, position, last_fed, created_at} = sourdoughs[0];
+
+                starterDetails.starter_name.textContent = starter_name || 'Nincs név megadva';
+                starterDetails.hydration_level.textContent = hydration_level || 'Nincs adat';
+                starterDetails.position.textContent = position || 'Nincs pozíció';
+                starterDetails.last_fed.textContent = last_fed ? new Date(last_fed).toLocaleString() : 'Nincs adat';
+                starterDetails.created_at.textContent = created_at ? new Date(created_at).toLocaleString() : 'Nincs adat';
+            } catch (error) {
+                console.error('Hiba a kovász adatok betöltésekor:', error);
+                alert('Nem sikerült betölteni a kovász adatait.');
+            }
+        }
+
+        feedButton.addEventListener('click', async () => {
+            try {
+                const sourdoughResponse = await axios.get(`/api/sourdough/user/${userID}`);
+                const sourdoughs = sourdoughResponse.data.data;
+
+                if (sourdoughs && sourdoughs.length > 0) {
+                    const sourdough = sourdoughs[0];
+
+                    const updatedData = {
+                        name: sourdough.starter_name,
+                        hydration_level: sourdough.hydration_level,
+                        position: sourdough.position,
+                        last_fed: formatDateForMySQL(new Date()),
+                    };
+                    await axios.patch(`/api/sourdough/id/${sourdough.id}`, updatedData);
+                    alert('A kovászt sikeresen megetetted!');
+                    await fetchStarter();
+                } else {
+                    alert('Nem található kovász a felhasználóhoz.');
+                }
+            } catch (error) {
+                console.error('Hiba a kovász etetésekor:', error);
+            }
+        });
+
+        deleteButton.addEventListener('click', async () => {
+            const confirmDelete = confirm('Biztosan törölni szeretnéd a kovászodat?');
+            if (confirmDelete) {
+                try {
+                    const sourdoughResponse = await axios.get(`/api/sourdough/user/${userID}`);
+                    const sourdoughs = sourdoughResponse.data.data;
+
+                    if (sourdoughs && sourdoughs.length > 0) {
+                        const sourdoughID = sourdoughs[0].id;
+                        await axios.delete(`/api/sourdough/${sourdoughID}`);
+                        alert('A kovászt törölted!');
+                        window.location.href = '/api/main';
+                    } else {
+                        alert('Nem található kovász a felhasználóhoz.');
+                    }
+                } catch (error) {
+                    console.error('Hiba a kovász törlésekor:', error);
+                    alert('Nem sikerült törölni a kovászt.');
+                }
+            }
+        });
+
+        fetchStarter();
+    });
 </script>
 </body>
 </html>
