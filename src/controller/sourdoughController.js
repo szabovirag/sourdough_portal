@@ -92,9 +92,9 @@ exports.addSourdough = async (req, res) => {
 
 exports.updateSourdough = async (req, res) => {
     const { id } = req.params;
-    const { name, hydrationLevel, position, last_fed } = req.body;
+    const { name, hydration_level, position, last_fed } = req.body;
     try {
-        const updatedSourdough = await dataAccessLayer.updateSourdoughLog(id, name, hydrationLevel, position, last_fed);
+        const updatedSourdough = await dataAccessLayer.updateSourdoughLog(id, name, hydration_level, position, last_fed);
         if (!updatedSourdough) {
             return res.status(404).json({
                 status: 'fail',
@@ -106,7 +106,7 @@ exports.updateSourdough = async (req, res) => {
             data: {
                 id: id,
                 name: name,
-                hydrationLevel: hydrationLevel,
+                hydration_level: hydration_level,
                 position: position,
                 last_fed: last_fed
             },
